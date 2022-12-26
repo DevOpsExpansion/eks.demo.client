@@ -6,13 +6,13 @@ on:
       # - 'env/**'
       - main
 
-env:
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 jobs:
   setup:
     runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
     steps:
       - name: Checkout
@@ -21,21 +21,24 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 19.3.0
+          node-version: 16.19.0
           cache: 'npm'
 
       - run: npm ci
 
       - name: Build application
+        env: 
+          CI: false
         run: npm run build
 
       - name: Deploy to Amazon S3
         uses: Reggionick/s3-deploy@v3.1.1
         with:
           folder: build
-          bucket: ${{ secrets.S3_BUCKET_NAME }}
-          private: true
-          bucket-region: ${{ secrets.S3_BUCKET_REGION }}
 
-          dist-id: ${{ secrets.CF_DISTRIBUTION }}
-          invalidation: /*
+          bucket: ${{ secrets.S3_BUCKET_NAME }}
+          bucket-region: ${{ secrets.S3_BUCKET_REGION }}
+          private: true
+
+          # dist-id: ${{ secrets.DISTRIBUTION_ID }}
+          # invalidation: /
