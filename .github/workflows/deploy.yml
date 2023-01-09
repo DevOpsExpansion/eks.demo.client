@@ -10,12 +10,12 @@ on:
 
   push:
     branches:
-      - 'env/**'
-      - main
+      - 'env.**'
 
 
 jobs:
   setup:
+    environment: ${{ github.ref_name }}
     runs-on: ubuntu-latest
     permissions:
       id-token: write
